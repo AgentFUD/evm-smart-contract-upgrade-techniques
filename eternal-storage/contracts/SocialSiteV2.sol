@@ -2,11 +2,11 @@
 
 pragma solidity ^0.8.9;
 
-import "./SocialLib.sol";
+import "./SocialLibV2.sol";
 
-contract SocialSite {
+contract SocialSiteV2 {
     
-    using SocialLib for address;
+    using SocialLibV2 for address;
     address eternalStorage;
 
     constructor(address _eternalStorage) {
@@ -14,10 +14,14 @@ contract SocialSite {
     }
 
     function like(string memory _url) public {
+        require(eternalStorage.getUserHasLikedURL(_url) == false, "ERROR: User has already liked");
+        eternalStorage.setUserHasLikedURL(_url);
         eternalStorage.likeURL(_url);
     }
 
     function disLike(string memory _url) public {
+        require(eternalStorage.getUserHasDisLikedURL(_url) == false, "ERROR: User has already disliked");
+        eternalStorage.setUserHasDisLikedURL(_url);
         eternalStorage.disLikeURL(_url);
     }
 
