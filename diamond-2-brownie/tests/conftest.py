@@ -4,7 +4,7 @@ from scripts.helpers import facetCutAction, getSelectors
 
 
 @pytest.fixture(scope="module")
-def contracts(
+def deployed_contracts(
     accounts,
     Diamond,
     DiamondInit,
@@ -36,10 +36,6 @@ def contracts(
 
     # DiamondCutFacet at diamond.address
     diamondCut = Contract.from_abi("DiamondCut", diamond.address, diamondCutFacet.abi)
-    diamondLoupe = Contract.from_abi(
-        "DiamondLoupe", diamond.address, diamondLoupeFacet.abi
-    )
-    ownership = Contract.from_abi("Ownership", diamond.address, ownershipFacet.abi)
 
     # DiamondInit has only one function, init()
     initSelector = getSelectors(DiamondInit)[0]
@@ -47,4 +43,11 @@ def contracts(
     # Cutting the Diamond
     diamondCut.diamondCut(cut, diamondInit.address, initSelector, {"from": owner})
 
-    return diamond, diamondCut, diamondLoupe, ownership, test1Facet, test2Facet
+    return (
+        diamond,
+        diamondCutFacet,
+        diamondLoupeFacet,
+        ownershipFacet,
+        test1Facet,
+        test2Facet,
+    )
