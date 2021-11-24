@@ -1,22 +1,27 @@
-from brownie import Contract, accounts
-from brownie import (
-    Diamond,
-    DiamondCutFacet,
-    DiamondLoupeFacet,
-    OwnershipFacet,
-    DiamondInit,
-)
-
-# from brownie import Test1Facet, Test2Facet
+import pytest
+from brownie import Contract
 from scripts.helpers import facetCutAction, getSelectors
 
 
-def main():
+@pytest.fixture(scope="module")
+def deployed_contracts(
+    accounts,
+    Diamond,
+    DiamondInit,
+    DiamondCutFacet,
+    DiamondLoupeFacet,
+    OwnershipFacet,
+    Test1Facet,
+    Test2Facet,
+):
     owner = accounts[0]
 
     diamondCutFacet = DiamondCutFacet.deploy({"from": owner})
     diamondLoupeFacet = DiamondLoupeFacet.deploy({"from": owner})
     ownershipFacet = OwnershipFacet.deploy({"from": owner})
+    test1Facet = Test1Facet.deploy({"from": owner})
+    test2Facet = Test2Facet.deploy({"from": owner})
+
     diamondInit = DiamondInit.deploy({"from": owner})
     diamond = Diamond.deploy(owner, diamondCutFacet.address, {"from": owner})
 
@@ -31,6 +36,18 @@ def main():
 
     # DiamondCutFacet at diamond.address
     diamondCut = Contract.from_abi("DiamondCut", diamond.address, diamondCutFacet.abi)
-    initSelector = getSelectors(DiamondInit)
 
-    diamondCut.diamondCut(cut, diamondInit.address, initSelector[0], {"from": owner})
+    # DiamondInit has only one function, init()
+    initSelector = getSelectors(DiamondInit)[0]
+
+    # Cutting the Diamond
+    diamondCut.diamondCut(cut, diamondInit.address, initSelector, {"from": owner})
+
+    return (
+        diamond,
+        diamondCutFacet,
+        diamondLoupeFacet,
+        ownershipFacet,
+        test1Facet,
+        test2Facet,
+    )

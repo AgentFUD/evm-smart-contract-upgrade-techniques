@@ -8,7 +8,7 @@ from scripts.helpers import (
 )
 
 
-def test_add_most_functions_and_facets(accounts, deployed_contracts):
+def test_add_test1_and_test2_facet_functions(accounts, deployed_contracts):
     owner = accounts[0]
 
     diamond = deployed_contracts[0]
